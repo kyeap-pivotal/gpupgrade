@@ -62,15 +62,15 @@ var _ = Describe("prepare init-cluster", func() {
 		Expect(checkPortIsAvailable(port)).To(BeTrue())
 	})
 
-	It("starts the target cluster, and generates a new_cluster_config.json", func() {
-		statusSessionPending := runCommand("status", "upgrade")
-		Eventually(statusSessionPending).Should(gbytes.Say("PENDING - Initialize upgrade target cluster"))
-
+	FIt("starts the target cluster, and generates a new_cluster_config.json", func() {
 		checkConfigSession := runCommand("check", "config", "--master-host", "localhost", "--old-bindir", "/tmp")
 		Eventually(checkConfigSession).Should(Exit(0))
 
 		agentSession := runCommand("prepare", "start-agents")
 		Eventually(agentSession).Should(Exit(0))
+
+		statusSessionPending := runCommand("status", "upgrade")
+		Eventually(statusSessionPending).Should(gbytes.Say("PENDING - Initialize upgrade target cluster"))
 
 		prepareSession := runCommand("prepare", "init-cluster")
 		Eventually(prepareSession).Should(Exit(0))
