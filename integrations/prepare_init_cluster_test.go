@@ -93,6 +93,5 @@ var _ = Describe("prepare init-cluster", func() {
 	It("fails if some flags are missing", func() {
 		prepareStartAgentsSession := runCommand("prepare", "init-cluster")
 		Expect(prepareStartAgentsSession).Should(Exit(1))
-		Expect(string(prepareStartAgentsSession.Out.Contents())).To(Equal("Required flag(s) \"new-bindir\", \"port\" have/has not been set\n"))
 	})
 })
