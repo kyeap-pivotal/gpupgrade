@@ -184,10 +184,14 @@ func (h *Hub) PrepareInitCluster(ctx context.Context, in *pb.PrepareInitClusterR
 
 	//seg prefix
 	mdd := oldReader.GetMasterDataDir()
-	segPrefix := path.Base(mdd)
+
+	segPrefix, err := getMasterSegPrefix(mdd)
+	if err != nil {
+		return &pb.PrepareInitClusterReply{}, err
+	}
+
 	gplog.Info("Data Dir: %s", mdd)
 	gplog.Info("segPrefix: %v", segPrefix)
-	segPrefix = segPrefix[:len(segPrefix)-2]
 	gpinitsystemConfig = append(gpinitsystemConfig, fmt.Sprintf("SEG_PREFIX=%s_upgrade", segPrefix))
 
 	//determine good chunk of port base, try old port base +1 first
@@ -288,4 +292,19 @@ func (h *Hub) PrepareInitCluster(ctx context.Context, in *pb.PrepareInitClusterR
 	}
 
 	return &pb.PrepareInitClusterReply{}, nil
+}
+
+func getMasterSegPrefix(datadir string) (string, error) {
+	const masterContentID = "-1"
+
+	base := path.Base(datadir)
+	if !strings.HasSuffix(base, masterContentID) {
+		return "", fmt.Errorf("path requires a master content identifier: '%s'", datadir)
+	}
+
+	segPrefix := strings.TrimSuffix(base, masterContentID)
+	if segPrefix == "" {
+		return "", fmt.Errorf("path has no segment prefix: '%s'", datadir)
+	}
+	return segPrefix, nil
 }
