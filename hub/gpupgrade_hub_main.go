@@ -45,9 +45,14 @@ func main() {
 
 			clusterPair := cluster.NewClusterPair(conf.StateDir, commandExecer)
 
+			pingmanager, err := services.NewPingerManager(conf.StateDir, 500*time.Millisecond)
+			if err != nil {
+				return err
+			}
+
 			clusterSsher := cluster_ssher.NewClusterSsher(
 				upgradestatus.NewChecklistManager(conf.StateDir),
-				services.NewPingerManager(conf.StateDir, 500*time.Millisecond),
+				pingmanager,
 				commandExecer,
 			)
 			hub := services.NewHub(clusterPair, &reader, grpc.DialContext, commandExecer, conf, clusterSsher)

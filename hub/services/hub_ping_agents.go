@@ -16,12 +16,12 @@ type PingerManager struct {
 	PauseBeforeRetry time.Duration
 }
 
-func NewPingerManager(baseDir string, t time.Duration) *PingerManager {
+func NewPingerManager(baseDir string, t time.Duration) (*PingerManager, error) {
 	rpcClients, err := configutils.GetClients(baseDir)
 	if err != nil {
-		return &PingerManager{}
+		return nil, err
 	}
-	return &PingerManager{rpcClients, 10, t}
+	return &PingerManager{rpcClients, 10, t}, nil
 }
 
 func (agent *PingerManager) PingPollAgents() error {

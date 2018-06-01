@@ -55,9 +55,12 @@ var _ = Describe("check config", func() {
 		commandExecer = &testutils.FakeCommandExecer{}
 		commandExecer.SetOutput(&testutils.FakeCommand{})
 
+		pingmanager, err := services.NewPingerManager(conf.StateDir, 500*time.Millisecond)
+		Expect(err).ToNot(HaveOccurred())
+
 		clusterSsher := cluster_ssher.NewClusterSsher(
 			upgradestatus.NewChecklistManager(conf.StateDir),
-			services.NewPingerManager(conf.StateDir, 500*time.Millisecond),
+			pingmanager,
 			commandExecer.Exec,
 		)
 		hub = services.NewHub(&cluster.Pair{}, &reader, grpc.DialContext, commandExecer.Exec, conf, clusterSsher)
