@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	pb "github.com/greenplum-db/gpupgrade/idl"
+	"github.com/greenplum-db/gpupgrade/utils"
 
 	"github.com/greenplum-db/gpupgrade/hub/upgradestatus"
 
@@ -36,7 +37,8 @@ func (h *Hub) shareOidFiles() {
 
 	hostnames := h.source.PrimaryHostnames()
 
-	user := "gpadmin"
+	user := utils.GetCurrentUser()
+
 	rsyncFlags := "-rzpogt"
 	sourceDir := filepath.Join(h.conf.StateDir, "pg_upgrade")
 

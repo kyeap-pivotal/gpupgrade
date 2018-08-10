@@ -145,3 +145,19 @@ func WriteJSONFile(fileName string, contents interface{}) error {
 
 	return nil
 }
+
+func GetCurrentUser() string {
+	defaultUser := "gpadmin"
+
+	username := System.Getenv("PGUSER")
+	if username == "" {
+		currentUser, err := System.CurrentUser()
+		if err != nil {
+			gplog.Verbose("Error retrieving current os user, defaulting to %s", defaultUser)
+			username = defaultUser
+		} else {
+			username = currentUser.Username
+		}
+	}
+	return username
+}

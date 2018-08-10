@@ -195,4 +195,41 @@ var _ = Describe("user utils", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
+
+	Describe("GetCurrentUser", func() {
+		var saved string
+
+		BeforeEach(func() {
+			saved = os.Getenv("PGUSER")
+		})
+
+		AfterEach(func() {
+			os.Setenv("PGUSER", saved)
+		})
+
+		It("returns PGUSER if it is set", func() {
+			os.Setenv("PGUSER", "root")
+
+			user := GetCurrentUser()
+			Expect(user).To(Equal("root"))
+		})
+
+		It("returns system user if PGUSER not set", func() {
+			os.Unsetenv("PGUSER")
+
+			user := GetCurrentUser()
+			systemUser, _ := System.CurrentUser()
+			Expect(user).To(Equal(systemUser.Username))
+		})
+
+		It("returns gpadmin if system user and PGUSER are both not set", func() {
+			System.CurrentUser = func() (*user.User, error) {
+				return nil, errors.New("bad user")
+			}
+			os.Unsetenv("PGUSER")
+
+			user := GetCurrentUser()
+			Expect(user).To(Equal("gpadmin"))
+		})
+	})
 })

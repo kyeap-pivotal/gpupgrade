@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/user"
 	"path"
 
 	"github.com/greenplum-db/gp-common-go-libs/cluster"
@@ -177,17 +176,6 @@ var _ = Describe("Cluster", func() {
 			Expect(dbConnector.User).To(Equal(expectedUser))
 		})
 
-		It("sets the default user if neither PGUSER or current user are available", func() {
-			os.Unsetenv("PGUSER")
-
-			operating.System.CurrentUser = func() (*user.User, error) {
-				return nil, errors.New("Your systems is seriously borked if this fails")
-			}
-
-			dbConnector := c.NewDBConn()
-
-			Expect(dbConnector.User).To(Equal("gpadmin"))
-		})
 		// FIXME: protect against badly initialized clusters
 	})
 	Describe("RefreshConfig", func() {
